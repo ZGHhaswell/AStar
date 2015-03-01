@@ -69,7 +69,7 @@ namespace AStar
                         sn.Parent = node;
                         _openList.Add(sn);
                     }
-                }
+                } 
 
                 _closedList.Add(node);
             }
