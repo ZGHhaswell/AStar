@@ -42,7 +42,7 @@ namespace AStar
             //End Point   [4, 7]
 
             var startNode = map[2, 1];
-            var endNode = map[4, 7];
+            var endNode = map[9, 9];
 
             var open = new List<Node>();
             var close = new List<Node>();
@@ -52,8 +52,10 @@ namespace AStar
             while (open.Count != 0)
             {
                 var node = MinGInNodes(open);
+                node.IsPath = true;
                 open.Remove(node);
                 close.Add(node);
+                //PrintMap(map);
 
                 if(node == endNode)
                     break;
@@ -61,18 +63,24 @@ namespace AStar
                 var nextNodes = NextNodes(map, node);
                 foreach (var nextNode in nextNodes)
                 {
-                    nextNode.G = Node.Distance(nextNode, node);
-                    nextNode.H = Node.Distance(nextNode, endNode);
+                    if (close.Contains(nextNode))
+                    {
+                        continue;
+                    }
 
                     if (open.Contains(nextNode))
                     {
-                        
+                        continue;
+                    }
+                    else
+                    {
+                        nextNode.G = Node.Distance(nextNode, node);
+                        nextNode.H = Node.Distance(nextNode, endNode);
+                        open.Add(nextNode);
+                        nextNode.ParentNode = node;
                     }
 
-                    if (!close.Contains(nextNode))
-                    {
-                        open.Add(nextNode);
-                    }
+                    
                 }
                 
             }
@@ -91,14 +99,9 @@ namespace AStar
              * 0 0 0 0 0 0 0 0 0 0 
              */
 
-            Node pNode = endNode;
-            do
-            {
-                pNode = pNode.ParentNode;
+            PrintMap(map);
 
-                if (pNode != null)
-                    Console.WriteLine(pNode.X + " " + pNode.Y);
-            } while (pNode != null);
+            Console.ReadLine();
 
 
             //Map map = new Map();
@@ -153,10 +156,31 @@ namespace AStar
             //Console.ReadLine(); 
         }
 
-        private static int G(Node startNode, Node endNode, Node currentNode)
+        private static void PrintMap(Node[,] map)
         {
-            return Node.Distance(startNode, currentNode) + Node.Distance(endNode, currentNode);
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (map[i, j].IsPath)
+                    {
+                        Console.Write("* ");
+                    }
+                    else if (map[i, j].IsWall)
+                    {
+                        Console.Write("1 ");
+                    }
+                    else
+                    {
+                        Console.Write("0 ");
+                    }
+                    
+                }
+                Console.Write("\n");
+            }
+            Console.Write("\n");
         }
+
 
         private static Node MinGInNodes(List<Node> nodes)
         {
@@ -221,6 +245,8 @@ namespace AStar
         public int G{ get; set; }
 
         public int H { get; set; }
+
+        public bool IsPath { get; set; }
 
         public bool IsWall { get; set; }
 
